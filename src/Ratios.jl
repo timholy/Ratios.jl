@@ -1,6 +1,6 @@
 module Ratios
 
-import Base: convert, promote_rule
+import Base: convert, promote_rule, *, /, +, -, ^, ==
 
 export SimpleRatio
 
