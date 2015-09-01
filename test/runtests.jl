@@ -29,6 +29,5 @@ r2 = SimpleRatio(2,3)
 
 @test r + SimpleRatio(0x02,0x03) == SimpleRatio(7,6)
 
-@test Rational{Int}(11,10) == 11//10
-@test SimpleRatio{Int}(11//10) == 11//10
-@test 1//3 + SimpleRatio(1,5) == 8//15
+@test SimpleRatio(11, 10) == 11//10
+@test 1//3 + SimpleRatio(1, 5) == 8//15
