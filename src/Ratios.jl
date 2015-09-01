@@ -15,6 +15,8 @@ function convert{T<:FloatingPoint,S}(::Type{T}, r::SimpleRatio{S})
     convert(T, convert(P, r.num)/convert(P, r.den))
 end
 convert{T<:Integer}(::Type{SimpleRatio{T}}, i::Integer) = SimpleRatio{T}(convert(T, i), one(T))
+convert{T<:Integer, S<:Integer}(::Type{SimpleRatio{T}}, r::Rational{S}) = SimpleRatio(convert(T, r.num), convert(T, r.den))
+convert{T<:Integer, S<:Integer}(::Type{Rational{T}}, r::SimpleRatio{S}) = convert(T, r.num) // convert(T, r.den)
 
 *(x::SimpleRatio, y::SimpleRatio) = SimpleRatio(x.num*y.num, x.den*y.den)
 *(x::SimpleRatio, y::Bool) = SimpleRatio(x.num*y, x.den)
@@ -36,6 +38,7 @@ convert{T<:Integer}(::Type{SimpleRatio{T}}, i::Integer) = SimpleRatio{T}(convert
 promote_rule{T<:Integer,S<:Integer}(::Type{SimpleRatio{T}}, ::Type{S}) = SimpleRatio{promote_type(T,S)}
 promote_rule{T<:Integer,S<:Integer}(::Type{SimpleRatio{T}}, ::Type{SimpleRatio{S}}) = SimpleRatio{promote_type(T,S)}
 promote_rule{T<:Integer,S<:FloatingPoint}(::Type{SimpleRatio{T}}, ::Type{S}) = promote_type(T,S)
+promote_rule{T<:Integer,S<:Integer}(::Type{SimpleRatio{T}}, ::Type{Rational{S}}) = Rational{promote_type(T,S)}
 
 ==(x::SimpleRatio, y::SimpleRatio) = x.num*y.den == x.den*y.num
 

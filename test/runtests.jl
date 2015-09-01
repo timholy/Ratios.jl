@@ -28,3 +28,6 @@ r2 = SimpleRatio(2,3)
 @test_throws OverflowError -SimpleRatio(0x02,0x03)
 
 @test r + SimpleRatio(0x02,0x03) == SimpleRatio(7,6)
+
+@test SimpleRatio(11, 10) == 11//10
+@test 1//3 + SimpleRatio(1, 5) == 8//15
