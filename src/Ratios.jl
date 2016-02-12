@@ -45,6 +45,9 @@ macro oc(ex)
     end
 end
 
+safe_add(x::Integer,y::Integer) = safe_add(promote(x,y)...)
+safe_sub(x::Integer,y::Integer) = safe_sub(promote(x,y)...)
+
 
 import Base: divgcd
 
@@ -127,7 +130,7 @@ function +{T}(x::Integer, y::SimpleRatio{T})
     return SimpleRatio(@oc(@oc(x ⊠ y.den) ⊞ y.num), y.den)
 
     @label overflow
-    num = x ⊗ y.den ⊞ y.num
+    num = x ⊗ y.den + y.num
     num, den = divgcd(num, y.den)
     typemin(T) <= num <= typemax(T) || throw(OverflowError())
     SimpleRatio(num % T, den % T)
@@ -139,7 +142,7 @@ function -{T}(x::Integer, y::SimpleRatio{T})
     return SimpleRatio(@oc(@oc(x ⊠ y.den) ⊟ y.num), y.den)
 
     @label overflow
-    num = x ⊗ y.den ⊟ y.num
+    num = x ⊗ y.den - y.num
     num, den = divgcd(num, y.den)
     typemin(T) <= num <= typemax(T) || throw(OverflowError())
     SimpleRatio(num % T, den % T)
@@ -148,7 +151,7 @@ function -{T}(x::SimpleRatio{T}, y::Integer)
     return SimpleRatio(@oc(x.num ⊟ @oc(y ⊠ x.den)), x.den)
 
     @label overflow
-    num = x.num ⊟ y ⊗ x.den
+    num = x.num - y ⊗ x.den
     num, den = divgcd(num, x.den)
     typemin(T) <= num <= typemax(T) || throw(OverflowError())
     SimpleRatio(num % T, den % T)
