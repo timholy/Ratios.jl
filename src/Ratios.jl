@@ -40,7 +40,9 @@ end
 macro oc(ex)
     quote
         x = $(esc(ex))
-        isnull(x) && @goto overflow
+        if isnull(x)
+            @goto overflow
+        end        
         get(x)
     end
 end
@@ -126,7 +128,7 @@ function /{T}(x::Integer, y::SimpleRatio{T})
     return SimpleRatio(num % T, den % T)
 end
     
-function +{T}(x::Integer, y::SimpleRatio{T})
+function add{T}(x::Integer, y::SimpleRatio{T})
     return SimpleRatio(@oc(@oc(x ⊠ y.den) ⊞ y.num), y.den)
 
     @label overflow
@@ -213,5 +215,5 @@ end
 
 ==(q::SimpleRatio, x::AbstractFloat) = x == q
 
-
 end
+
