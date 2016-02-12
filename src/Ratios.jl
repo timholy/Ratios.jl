@@ -181,7 +181,7 @@ function -{T}(x::SimpleRatio{T}, y::SimpleRatio{T})
     end
 
     @label overflow
-    num = x.num ⊗ y.den ⊟ x.den ⊗ y.num
+    num = x.num ⊗ y.den - x.den ⊗ y.num
     den = x.den ⊗ y.den
     num, den = divgcd(num, den)
     typemin(T) <= num <= typemax(T) && typemin(T) <= den <= typemax(T) || throw(OverflowError())
