@@ -1,6 +1,6 @@
 module Ratios
 
-import Base: convert, promote_rule
+import Base: convert, promote_rule, +, -, *, /, ^, ==
 
 export SimpleRatio
 
@@ -18,7 +18,7 @@ const ⊗ = widemul
 
 
 convert{S}(::Type{BigFloat}, r::SimpleRatio{S}) = BigFloat(r.num)/r.den
-function convert{T<:FloatingPoint,S}(::Type{T}, r::SimpleRatio{S})
+function convert{T<:AbstractFloat,S}(::Type{T}, r::SimpleRatio{S})
     P = promote_type(T,S)
     convert(T, convert(P, r.num)/convert(P, r.den))
 end
@@ -176,14 +176,14 @@ end
 
 promote_rule{T<:Integer,S<:Integer}(::Type{SimpleRatio{T}}, ::Type{S}) = SimpleRatio{promote_type(T,S)}
 promote_rule{T<:Integer,S<:Integer}(::Type{SimpleRatio{T}}, ::Type{SimpleRatio{S}}) = SimpleRatio{promote_type(T,S)}
-promote_rule{T<:Integer,S<:FloatingPoint}(::Type{SimpleRatio{T}}, ::Type{S}) = promote_type(T,S)
+promote_rule{T<:Integer,S<:AbstractFloat}(::Type{SimpleRatio{T}}, ::Type{S}) = promote_type(T,S)
 
 ==(x::SimpleRatio, y::SimpleRatio) = x.num*y.den == x.den*y.num
 
 ==(x::SimpleRatio, y::Integer) = x.num == x.den*y
 ==(x::Integer, y::SimpleRatio) = x*y.den == y.num
 
-function ==(x::FloatingPoint, q::SimpleRatio)
+function ==(x::AbstractFloat, q::SimpleRatio)
     if isfinite(x)
         (count_ones(q.den) == 1) & (x*q.den == q.num)
     else
@@ -191,6 +191,6 @@ function ==(x::FloatingPoint, q::SimpleRatio)
     end
 end
 
-==(q::SimpleRatio, x::FloatingPoint) = x == q
+==(q::SimpleRatio, x::AbstractFloat) = x == q
 
 end
