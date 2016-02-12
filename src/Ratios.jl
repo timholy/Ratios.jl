@@ -10,43 +10,30 @@ immutable SimpleRatio{T<:Integer} <: Real
 end
 
 
-function try_checked_add(x::Int, y::Int)
-    x,n = Base.llvmcall(("declare { i64, i1 } @llvm.sadd.with.overflow.i64(i64, i64)",
-                        """
-    %xo = call { i64, i1 } @llvm.sadd.with.overflow.i64(i64 %0, i64 %1)
-    %x = extractvalue { i64, i1 } %xo, 0
-    %o1 = extractvalue { i64, i1 } %xo, 1
-    %o8 = zext i1 %o1 to i8
-    %rx = insertvalue { i64, i8 } undef, i64 %x, 0
-    %r = insertvalue { i64, i8 } %rx, i8 %o8, 1
-    ret { i64, i8 } %r"""),
-    Tuple{Int64,Bool},Tuple{Int64,Int64},x,y)
-    Nullable(x,n)
-end
-function try_checked_sub(x::Int, y::Int)
-    x,n = Base.llvmcall(("declare { i64, i1 } @llvm.ssub.with.overflow.i64(i64, i64)",
-                        """
-    %xo = call { i64, i1 } @llvm.ssub.with.overflow.i64(i64 %0, i64 %1)
-    %x = extractvalue { i64, i1 } %xo, 0
-    %o1 = extractvalue { i64, i1 } %xo, 1
-    %o8 = zext i1 %o1 to i8
-    %rx = insertvalue { i64, i8 } undef, i64 %x, 0
-    %r = insertvalue { i64, i8 } %rx, i8 %o8, 1
-    ret { i64, i8 } %r"""),
-    Tuple{Int64,Bool},Tuple{Int64,Int64},x,y)
-    Nullable(x,n)
-end
-function try_checked_mul(x::Int, y::Int)
-    x,n = Base.llvmcall(("declare { i64, i1 } @llvm.smul.with.overflow.i64(i64, i64)","""
-    %xo = call { i64, i1 } @llvm.smul.with.overflow.i64(i64 %0, i64 %1)
-    %x = extractvalue { i64, i1 } %xo, 0
-    %o1 = extractvalue { i64, i1 } %xo, 1
-    %o8 = zext i1 %o1 to i8
-    %rx = insertvalue { i64, i8 } undef, i64 %x, 0
-    %r = insertvalue { i64, i8 } %rx, i8 %o8, 1
-    ret { i64, i8 } %r"""),
-    Tuple{Int64,Bool},Tuple{Int64,Int64},x,y)
-    Nullable(x,n)
+for I in [Int8,Int16,Int32,Int64,Int128,
+          UInt8,UInt16,UInt32,UInt64,UInt128]
+
+    s = I <: Signed ? 's' : 'u'
+    b = sizeof(I) << 3
+    r = b == 8 ? "[2 x i8]" : "{ i$b, i8 }" # LLVM return type
+    
+    for op in [:add,:sub,:mul]
+        f = symbol(:safe_,op)
+        @eval @inline function $f(x::$I, y::$I)
+            x,n = Base.llvmcall((
+            $"declare { i$b, i1 } @llvm.$(s)$(op).with.overflow.i$b(i$b, i$b)",
+            $"""
+            %xo = call { i$b, i1 } @llvm.$(s)$(op).with.overflow.i$b(i$b %0, i$b %1)
+            %x  = extractvalue { i$b, i1 } %xo, 0
+            %o1 = extractvalue { i$b, i1 } %xo, 1
+            %o8 = zext i1 %o1 to i8
+            %rx = insertvalue $r undef, i$b %x, 0
+            %r  = insertvalue $r %rx, i8 %o8, 1
+            ret $r %r"""),
+            Tuple{$I,Bool},Tuple{$I,$I},x,y)
+            Nullable(x,n)
+        end
+    end
 end
 
 # overflow check macro
@@ -61,9 +48,9 @@ end
 
 import Base: divgcd
 
-const ⊞ = try_checked_add
-const ⊟ = try_checked_sub
-const ⊠ = try_checked_mul
+const ⊞ = safe_add
+const ⊟ = safe_sub
+const ⊠ = safe_mul
 const ⊗ = widemul
 
 
@@ -222,5 +209,6 @@ function ==(x::AbstractFloat, q::SimpleRatio)
 end
 
 ==(q::SimpleRatio, x::AbstractFloat) = x == q
+
 
 end
