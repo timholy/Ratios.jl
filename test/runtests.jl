@@ -21,7 +21,7 @@ r2 = SimpleRatio(2,3)
 @test r-r2 == SimpleRatio(-1,6)
 @test r^2 == SimpleRatio(1,4)
 @test -r == SimpleRatio(-1,2)
-@test_approx_eq 0.2*r 0.1
+@test 0.2*r ≈ 0.1
 @test r == 0.5
 @test 0.5 == r
 
