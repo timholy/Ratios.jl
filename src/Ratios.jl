@@ -1,6 +1,5 @@
 module Ratios
 
-using Compat
 import Base: convert, promote_rule, *, /, +, -, ^, ==
 
 export SimpleRatio
