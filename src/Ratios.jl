@@ -1,3 +1,5 @@
+__precompile__()
+
 module Ratios
 
 import Base: convert, promote_rule, *, /, +, -, ^, ==
