@@ -1,5 +1,5 @@
 using Ratios
-using Base.Test
+using Compat.Test
 
 r = SimpleRatio(1,2)
 @test convert(Float64, r) == 0.5

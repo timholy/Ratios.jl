@@ -6,19 +6,19 @@ import Base: convert, promote_rule, *, /, +, -, ^, ==
 
 export SimpleRatio
 
-immutable SimpleRatio{T<:Integer} <: Real
+struct SimpleRatio{T<:Integer} <: Real
     num::T
     den::T
 end
 
-convert{S}(::Type{BigFloat}, r::SimpleRatio{S}) = BigFloat(r.num)/r.den
-function convert{T<:AbstractFloat,S}(::Type{T}, r::SimpleRatio{S})
+convert(::Type{BigFloat}, r::SimpleRatio{S}) where {S} = BigFloat(r.num)/r.den
+function convert(::Type{T}, r::SimpleRatio{S}) where {T<:AbstractFloat,S}
     P = promote_type(T,S)
     convert(T, convert(P, r.num)/convert(P, r.den))
 end
-convert{T<:Integer}(::Type{SimpleRatio{T}}, i::Integer) = SimpleRatio{T}(convert(T, i), one(T))
-convert{T<:Integer, S<:Integer}(::Type{SimpleRatio{T}}, r::Rational{S}) = SimpleRatio(convert(T, r.num), convert(T, r.den))
-convert{T<:Integer, S<:Integer}(::Type{Rational{T}}, r::SimpleRatio{S}) = convert(T, r.num) // convert(T, r.den)
+convert(::Type{SimpleRatio{T}}, i::Integer) where {T<:Integer} = SimpleRatio{T}(convert(T, i), one(T))
+convert(::Type{SimpleRatio{T}}, r::Rational{S}) where {T<:Integer, S<:Integer} = SimpleRatio(convert(T, r.num), convert(T, r.den))
+convert(::Type{Rational{T}}, r::SimpleRatio{S}) where {T<:Integer, S<:Integer} = convert(T, r.num) // convert(T, r.den)
 
 *(x::SimpleRatio, y::SimpleRatio) = SimpleRatio(x.num*y.num, x.den*y.den)
 *(x::SimpleRatio, y::Bool) = SimpleRatio(x.num*y, x.den)
@@ -34,13 +34,13 @@ convert{T<:Integer, S<:Integer}(::Type{Rational{T}}, r::SimpleRatio{S}) = conver
 -(x::SimpleRatio, y::SimpleRatio) = SimpleRatio(x.num*y.den - x.den*y.num, x.den*y.den)
 ^(x::SimpleRatio, y::Integer) = SimpleRatio(x.num^y, x.den^y)
 
--{T<:Signed}(x::SimpleRatio{T}) = SimpleRatio(-x.num, x.den)
--{T<:Unsigned}(x::SimpleRatio{T}) = throw(OverflowError())
+-(x::SimpleRatio{T}) where {T<:Signed} = SimpleRatio(-x.num, x.den)
+-(x::SimpleRatio{T}) where {T<:Unsigned} = throw(VERSION < v"0.7.0-DEV.1269" ? OverflowError() : OverflowError("cannot negate unsigned number")) 
 
-promote_rule{T<:Integer,S<:Integer}(::Type{SimpleRatio{T}}, ::Type{S}) = SimpleRatio{promote_type(T,S)}
-promote_rule{T<:Integer,S<:Integer}(::Type{SimpleRatio{T}}, ::Type{SimpleRatio{S}}) = SimpleRatio{promote_type(T,S)}
-promote_rule{T<:Integer,S<:AbstractFloat}(::Type{SimpleRatio{T}}, ::Type{S}) = promote_type(T,S)
-promote_rule{T<:Integer,S<:Integer}(::Type{SimpleRatio{T}}, ::Type{Rational{S}}) = Rational{promote_type(T,S)}
+promote_rule(::Type{SimpleRatio{T}}, ::Type{S}) where {T<:Integer,S<:Integer} = SimpleRatio{promote_type(T,S)}
+promote_rule(::Type{SimpleRatio{T}}, ::Type{SimpleRatio{S}}) where {T<:Integer,S<:Integer} = SimpleRatio{promote_type(T,S)}
+promote_rule(::Type{SimpleRatio{T}}, ::Type{S}) where {T<:Integer,S<:AbstractFloat} = promote_type(T,S)
+promote_rule(::Type{SimpleRatio{T}}, ::Type{Rational{S}}) where {T<:Integer,S<:Integer} = Rational{promote_type(T,S)}
 
 ==(x::SimpleRatio, y::SimpleRatio) = x.num*y.den == x.den*y.num
 
