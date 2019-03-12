@@ -2,7 +2,7 @@ __precompile__()
 
 module Ratios
 
-import Base: convert, promote_rule, *, /, +, -, ^, ==
+import Base: convert, promote_rule, *, /, +, -, ^, ==, decompose
 
 export SimpleRatio
 
@@ -56,5 +56,7 @@ function ==(x::AbstractFloat, q::SimpleRatio)
 end
 
 ==(q::SimpleRatio, x::AbstractFloat) = x == q
+
+decompose(x::SimpleRatio) = x.num, 0, x.den
 
 end

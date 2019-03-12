@@ -31,3 +31,7 @@ r2 = SimpleRatio(2,3)
 
 @test SimpleRatio(11, 10) == 11//10
 @test 1//3 + SimpleRatio(1, 5) == 8//15
+
+@test isfinite(SimpleRatio(0,0)) == false
+@test isfinite(SimpleRatio(1,0)) == false
+@test isfinite(SimpleRatio(2,1)) == true
