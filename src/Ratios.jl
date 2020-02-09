@@ -1,5 +1,3 @@
-__precompile__()
-
 module Ratios
 
 import Base: convert, promote_rule, *, /, +, -, ^, ==, decompose
@@ -35,7 +33,7 @@ convert(::Type{Rational{T}}, r::SimpleRatio{S}) where {T<:Integer, S<:Integer} =
 ^(x::SimpleRatio, y::Integer) = SimpleRatio(x.num^y, x.den^y)
 
 -(x::SimpleRatio{T}) where {T<:Signed} = SimpleRatio(-x.num, x.den)
--(x::SimpleRatio{T}) where {T<:Unsigned} = throw(VERSION < v"0.7.0-DEV.1269" ? OverflowError() : OverflowError("cannot negate unsigned number")) 
+-(x::SimpleRatio{T}) where {T<:Unsigned} = throw(VERSION < v"0.7.0-DEV.1269" ? OverflowError() : OverflowError("cannot negate unsigned number"))
 
 promote_rule(::Type{SimpleRatio{T}}, ::Type{S}) where {T<:Integer,S<:Integer} = SimpleRatio{promote_type(T,S)}
 promote_rule(::Type{SimpleRatio{T}}, ::Type{SimpleRatio{S}}) where {T<:Integer,S<:Integer} = SimpleRatio{promote_type(T,S)}
