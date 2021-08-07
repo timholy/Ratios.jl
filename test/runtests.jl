@@ -1,4 +1,5 @@
 using Ratios, Test
+using FixedPointNumbers
 
 @testset "SimpleRatio" begin
     r = SimpleRatio(1,2)
@@ -35,4 +36,10 @@ using Ratios, Test
     @test isfinite(SimpleRatio(0,0)) == false
     @test isfinite(SimpleRatio(1,0)) == false
     @test isfinite(SimpleRatio(2,1)) == true
+
+    @test SimpleRatio(5,3) * 0.035N0f8 == SimpleRatio{Int}(rationalize((5*0.035N0f8)/3))
+    @test SimpleRatio(5,3) * 0.035N4f12 == SimpleRatio{Int}(rationalize((5*0.035N4f12)/3))
+    @test SimpleRatio(5,3) * -0.03Q0f7 == SimpleRatio{Int}(rationalize((5.0*(-0.03Q0f7))/3))
+    r = @inferred(SimpleRatio(0.75Q0f7))
+    @test r == 3//4 && r isa SimpleRatio{Int16}
 end
