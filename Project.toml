@@ -3,11 +3,15 @@ uuid = "c84ed2f1-dad5-54f0-aa8e-dbefe2724439"
 authors = ["Tim Holy <tim.holy@gmail.com>"]
 version = "0.4.0"
 
+[deps]
+Requires = "ae029012-a4dd-5104-9daa-d747884805df"
+
 [compat]
 julia = "0.7, 1"
 
 [extras]
+FixedPointNumbers = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test"]
+test = ["FixedPointNumbers", "Test"]
