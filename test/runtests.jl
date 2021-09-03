@@ -1,5 +1,6 @@
 using Ratios, Test
 using FixedPointNumbers
+using SaferIntegers
 
 @testset "SimpleRatio" begin
     r = SimpleRatio(1,2)
@@ -42,4 +43,35 @@ using FixedPointNumbers
     @test SimpleRatio(5,3) * -0.03Q0f7 == SimpleRatio{Int}(rationalize((5.0*(-0.03Q0f7))/3))
     r = @inferred(SimpleRatio(0.75Q0f7))
     @test r == 3//4 && r isa SimpleRatio{Int16}
+
+    @testset "SimpleRatio and SaferIntegers" begin
+        @test_throws OverflowError Ratios.SimpleRatio{SafeInt64}(99980001, 99980001) + Ratios.SimpleRatio{SafeInt64}(999800010000, 99980002)
+        @test -Ratios.SimpleRatio{SafeInt}(1,5) == Ratios.SimpleRatio{SafeInt}(-1,5)
+        @test_throws OverflowError -Ratios.SimpleRatio{SafeUInt}(1,5) == Ratios.SimpleRatio{SafeInt}(-1,5)
+        let a_den = 5, b_den = 255
+            @test b_den % a_den == 0
+            correct_numerator = b_den ÷ a_den + 1
+
+            # The addition overflows and the sum is wrong
+            T = UInt8
+            ST = SaferIntegers.safeint(T)
+            @test SimpleRatio{T}(1, a_den) + SimpleRatio{T}(1, b_den) == SimpleRatio{T}(correct_numerator, b_den)
+            @test convert(Float64, SimpleRatio{T}(1, a_den) + SimpleRatio{T}(1, b_den) ) != convert(Float64, SimpleRatio{T}(correct_numerator, b_den))
+            @test_throws OverflowError SimpleRatio{ST}(1, a_den) + SimpleRatio{ST}(1, b_den) == SimpleRatio{ST}(correct_numerator, b_den)
+
+            # The addition works, but checking equality overflows
+            T = UInt16
+            ST = SaferIntegers.safeint(T)
+            @test SimpleRatio{T}(1, a_den) + SimpleRatio{T}(1, b_den) == SimpleRatio{T}(correct_numerator, b_den)
+            @test convert(Float64, SimpleRatio{T}(1, a_den) + SimpleRatio{T}(1, b_den) ) == convert(Float64, SimpleRatio{T}(correct_numerator, b_den))
+            @test_throws OverflowError SimpleRatio{ST}(1, a_den) + SimpleRatio{ST}(1, b_den) == SimpleRatio{ST}(correct_numerator, b_den)
+
+            # No overflow, everything works
+            T = UInt32
+            ST = SaferIntegers.safeint(T)
+            @test SimpleRatio{T}(1, a_den) + SimpleRatio{T}(1, b_den) == SimpleRatio{T}(correct_numerator, b_den)
+            @test convert(Float64, SimpleRatio{T}(1, a_den) + SimpleRatio{T}(1, b_den) ) == convert(Float64, SimpleRatio{T}(correct_numerator, b_den))
+            @test SimpleRatio{ST}(1, a_den) + SimpleRatio{ST}(1, b_den) == SimpleRatio{ST}(correct_numerator, b_den)
+        end
+    end
 end

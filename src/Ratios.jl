@@ -72,6 +72,11 @@ function __init__()
         SimpleRatio(x::FixedPoint) = SimpleRatio(reinterpret(x), rawone_noerr(x))
         Base.convert(::Type{S}, x::FixedPoint) where S<:SimpleRatio = S(x)
     end
+    @require SaferIntegers = "88634af6-177f-5301-88b8-7819386cfa38" begin
+        using .SaferIntegers: SafeSigned, SafeUnsigned
+        -(x::SimpleRatio{T}) where {T<:SafeSigned} = SimpleRatio(-x.num, x.den)
+        -(x::SimpleRatio{T}) where {T<:SafeUnsigned} = throw(VERSION < v"0.7.0-DEV.1269" ? OverflowError() : OverflowError("cannot negate unsigned number"))
+    end
 end
 
 end
