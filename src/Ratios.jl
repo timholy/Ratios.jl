@@ -1,3 +1,13 @@
+"""
+`Ratios` provides `SimpleRatio`, a faster variant of `Rational`.
+Speed comes at the cost of greater vulnerability to overflow.
+
+API summary:
+
+- `r = SimpleRatio(num, den)` is equivalent to `num // den`
+- `common_denominator` standardizes a collection of `SimpleRatio`s to have the same denominator,
+  making some arithmetic operations among them less likely to overflow.
+"""
 module Ratios
 
 import Base: convert, promote_rule, *, /, +, -, ^, ==, decompose
@@ -11,6 +21,31 @@ struct SimpleRatio{T<:Integer} <: Real
     den::T
 end
 
+"""
+    SimpleRatio(num::Integer, den::Integer)
+
+Construct the equivalent of the rational number `num // den`.
+
+Operations with `SimpleRatio` are faster, but also more vulnerable to integer overflow,
+than with `Rational`. Arithmetic with `SimpleRatio` does not perform any simplification of the resulting ratios.
+The best defense against overflow is to use ratios with the same denominator: in such cases,
+`+` and `-` will skip forming the product of denominators. See [`common_denominator`](@ref).
+
+If overflow is a risk, consider constructing them using SaferIntegers.jl.
+
+# Examples
+
+```julia
+julia> x, y, z = SimpleRatio(1, 8), SimpleRatio(1, 4), SimpleRatio(2, 8)
+(SimpleRatio{$Int}(1, 8), SimpleRatio{$Int}(1, 4), SimpleRatio{$Int}(2, 8))
+
+julia> x+y
+SimpleRatio{$Int}(12, 32)
+
+julia> x+z
+SimpleRatio{$Int}(3, 8)
+```
+"""
 SimpleRatio(num::Integer, den::Integer) = SimpleRatio(promote(num, den)...)
 
 convert(::Type{BigFloat}, r::SimpleRatio{S}) where {S} = BigFloat(r.num)/r.den
@@ -63,6 +98,17 @@ end
 
 decompose(x::SimpleRatio) = x.num, 0, x.den
 
+"""
+    common_denominator(x::SimpleRatio, ys::SimpleRatio...)
+
+Return the equivalent of `(x, ys...)` but using a common denominator.
+This can be useful to avoid overflow.
+
+!!! info
+    This function is quite slow.  In performance-sensitive contexts where the
+    ratios are constructed with literal constants, it is better to ensure a common
+    denominator at the time of original construction.
+"""
 function common_denominator(x::SimpleRatio, ys::SimpleRatio...)
     all(y -> y.den == x.den, ys) && return (x, ys...)
     cd = gcd(x.den, map(y -> y.den, ys)...)        # common divisor
