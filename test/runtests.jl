@@ -26,6 +26,13 @@ using FixedPointNumbers
     @test r == 0.5
     @test 0.5 == r
 
+    r3 = SimpleRatio(7,3)
+    @test r2+r3 === SimpleRatio(9,3)
+    @test r2-r3 === SimpleRatio(-5,3)
+
+    r8 = SimpleRatio{Int8}(1, 20)
+    @test r8 + r8 == SimpleRatio(1, 10)
+
     @test_throws OverflowError -SimpleRatio(0x02,0x03)
 
     @test r + SimpleRatio(0x02,0x03) == SimpleRatio(7,6)

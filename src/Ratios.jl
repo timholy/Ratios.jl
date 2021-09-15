@@ -32,8 +32,10 @@ Rational{T}(r::SimpleRatio{S}) where {T<:Integer, S<:Integer} = convert(T, r.num
 /(x::Integer, y::SimpleRatio) = SimpleRatio(x*y.den, y.num)
 +(x::Integer, y::SimpleRatio) = SimpleRatio(x*y.den + y.num, y.den)
 -(x::Integer, y::SimpleRatio) = SimpleRatio(x*y.den - y.num, y.den)
-+(x::SimpleRatio, y::SimpleRatio) = SimpleRatio(x.num*y.den + x.den*y.num, x.den*y.den)
--(x::SimpleRatio, y::SimpleRatio) = SimpleRatio(x.num*y.den - x.den*y.num, x.den*y.den)
++(x::SimpleRatio, y::SimpleRatio) = x.den == y.den ? SimpleRatio(x.num + y.num, x.den) :
+                                                     SimpleRatio(x.num*y.den + x.den*y.num, x.den*y.den)
+-(x::SimpleRatio, y::SimpleRatio) = x.den == y.den ? SimpleRatio(x.num - y.num, x.den) :
+                                                     SimpleRatio(x.num*y.den - x.den*y.num, x.den*y.den)
 ^(x::SimpleRatio, y::Integer) = SimpleRatio(x.num^y, x.den^y)
 
 -(x::SimpleRatio{T}) where {T<:Signed} = SimpleRatio(-x.num, x.den)
