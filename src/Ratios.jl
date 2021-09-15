@@ -4,7 +4,7 @@ import Base: convert, promote_rule, *, /, +, -, ^, ==, decompose
 
 using Requires
 
-export SimpleRatio
+export SimpleRatio, common_denominator
 
 struct SimpleRatio{T<:Integer} <: Real
     num::T
@@ -62,6 +62,16 @@ end
 ==(q::SimpleRatio, x::AbstractFloat) = x == q
 
 decompose(x::SimpleRatio) = x.num, 0, x.den
+
+function common_denominator(x::SimpleRatio, ys::SimpleRatio...)
+    all(y -> y.den == x.den, ys) && return (x, ys...)
+    cd = gcd(x.den, map(y -> y.den, ys)...)        # common divisor
+    # product of the denominators
+    pd = Base.Checked.checked_mul(cd, mapreduce(z -> z.den ÷ cd, Base.Checked.checked_mul, (x, ys...)))
+    return map((x, ys...)) do z
+        SimpleRatio(z.num * (pd ÷ z.den), pd)
+    end
+end
 
 function __init__()
     @require FixedPointNumbers = "53c48c17-4a7d-5ca2-90c5-79b7896eea93" begin
