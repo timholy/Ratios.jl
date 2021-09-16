@@ -26,6 +26,13 @@ using FixedPointNumbers
     @test r == 0.5
     @test 0.5 == r
 
+    r3 = SimpleRatio(7,3)
+    @test r2+r3 === SimpleRatio(9,3)
+    @test r2-r3 === SimpleRatio(-5,3)
+
+    r8 = SimpleRatio{Int8}(1, 20)
+    @test r8 + r8 == SimpleRatio(1, 10)
+
     @test_throws OverflowError -SimpleRatio(0x02,0x03)
 
     @test r + SimpleRatio(0x02,0x03) == SimpleRatio(7,6)
@@ -42,4 +49,13 @@ using FixedPointNumbers
     @test SimpleRatio(5,3) * -0.03Q0f7 == SimpleRatio{Int}(rationalize((5.0*(-0.03Q0f7))/3))
     r = @inferred(SimpleRatio(0.75Q0f7))
     @test r == 3//4 && r isa SimpleRatio{Int16}
+
+    # common_denominator
+    @test common_denominator(SimpleRatio(2,7), SimpleRatio(3,11), SimpleRatio(-1,5)) ===
+        (SimpleRatio(2*11*5,385), SimpleRatio(3*7*5,385), SimpleRatio(-1*7*11,385))
+    @test common_denominator(SimpleRatio(5,12), SimpleRatio(4,15), SimpleRatio(-1,9)) ===
+        (SimpleRatio(75,180), SimpleRatio(48,180), SimpleRatio(-20,180))
+    @test_throws OverflowError common_denominator(SimpleRatio{Int8}(1, 20), SimpleRatio{Int8}(2, 21))
+    @test common_denominator(SimpleRatio{Int8}(1, 20), SimpleRatio{Int8}(3, 20)) ===
+        (SimpleRatio{Int8}(1, 20), SimpleRatio{Int8}(3, 20))
 end
