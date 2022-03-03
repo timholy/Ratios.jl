@@ -3,9 +3,9 @@ using FixedPointNumbers
 
 @testset "SimpleRatio" begin
     r = SimpleRatio(1,2)
-    @test convert(Float64, r) == 0.5
-    @test convert(Float32, r) == 0.5f0
-    @test convert(BigFloat, r) == BigFloat(1)/2
+    @test convert(Float64, r) === Float64(r) === 0.5
+    @test convert(Float32, r) === Float32(r) === 0.5f0
+    @test convert(BigFloat, r) == BigFloat(r) == BigFloat(1)/2
 
     r2 = SimpleRatio(2,3)
     @test r*r2 == SimpleRatio(2,6) == SimpleRatio(1,3)

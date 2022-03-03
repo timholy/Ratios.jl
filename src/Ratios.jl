@@ -53,6 +53,8 @@ function convert(::Type{T}, r::SimpleRatio{S}) where {T<:AbstractFloat,S}
     P = promote_type(T,S)
     convert(T, convert(P, r.num)/convert(P, r.den))
 end
+(::Type{T})(r::SimpleRatio) where T<:AbstractFloat = convert(T, r)
+
 SimpleRatio{T}(i::Integer) where {T<:Integer} = SimpleRatio{T}(convert(T, i), oneunit(T))
 SimpleRatio{T}(r::Rational{S}) where {T<:Integer, S<:Integer} = SimpleRatio(convert(T, r.num), convert(T, r.den))
 Rational{T}(r::SimpleRatio{S}) where {T<:Integer, S<:Integer} = convert(T, r.num) // convert(T, r.den)
