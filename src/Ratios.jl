@@ -12,7 +12,6 @@ module Ratios
 
 import Base: convert, promote_rule, *, /, +, -, ^, ==, decompose
 
-using Requires
 
 export SimpleRatio, common_denominator
 
@@ -121,17 +120,17 @@ function common_denominator(x::SimpleRatio, ys::SimpleRatio...)
     end
 end
 
+
+if !isdefined(Base, :get_extension)
+    using Requires
+end
+
+@static if !isdefined(Base, :get_extension)
 function __init__()
     @require FixedPointNumbers = "53c48c17-4a7d-5ca2-90c5-79b7896eea93" begin
-        using .FixedPointNumbers: FixedPoint, Fixed, Normed, rawone
-        rawone_noerr(::Type{Fixed{T,f}}) where {T,f} = widen(oneunit(T)) << f
-        rawone_noerr(::Type{N}) where N<:Normed = rawone(N)
-        rawone_noerr(x::FixedPoint) = rawone_noerr(typeof(x))
-        Base.promote_rule(::Type{SimpleRatio{S}}, ::Type{<:FixedPoint{T}}) where {S<:Integer,T<:Integer} = SimpleRatio{promote_type(S, T)}
-        SimpleRatio{S}(x::FixedPoint) where S<:Integer = SimpleRatio{S}(reinterpret(x), rawone_noerr(x))
-        SimpleRatio(x::FixedPoint) = SimpleRatio(reinterpret(x), rawone_noerr(x))
-        Base.convert(::Type{S}, x::FixedPoint) where S<:SimpleRatio = S(x)
+        include("../ext/RatiosFixedPointNumbersExt.jl")
     end
+end
 end
 
 end
