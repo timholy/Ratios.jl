@@ -6,9 +6,16 @@ version = "0.4.3"
 [deps]
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 
+[weakdeps]
+FixedPointNumbers = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
+
 [compat]
+FixedPointNumbers = "0.5, 0.6, 0.7, 0.8"
 Requires = "1"
 julia = "0.7, 1"
+
+[extensions]
+RatiosFixedPointNumbersExt = "FixedPointNumbers"
 
 [extras]
 FixedPointNumbers = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
