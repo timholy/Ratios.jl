@@ -10,7 +10,7 @@ API summary:
 """
 module Ratios
 
-import Base: convert, promote_rule, *, /, +, -, ^, ==, decompose
+import Base: convert, promote_rule, *, /, +, -, ^, ==, decompose, isinteger
 
 
 export SimpleRatio, common_denominator
@@ -98,6 +98,8 @@ end
 ==(q::SimpleRatio, x::AbstractFloat) = x == q
 
 decompose(x::SimpleRatio) = x.num, 0, x.den
+
+isinteger(x::SimpleRatio) = gcd(x.num, x.den) == abs(x.den)
 
 """
     common_denominator(x::SimpleRatio, ys::SimpleRatio...)

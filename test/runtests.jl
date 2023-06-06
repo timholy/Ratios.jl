@@ -58,4 +58,20 @@ using FixedPointNumbers
     @test_throws OverflowError common_denominator(SimpleRatio{Int8}(1, 20), SimpleRatio{Int8}(2, 21))
     @test common_denominator(SimpleRatio{Int8}(1, 20), SimpleRatio{Int8}(3, 20)) ===
         (SimpleRatio{Int8}(1, 20), SimpleRatio{Int8}(3, 20))
+
+    @test isinteger(SimpleRatio(12, 6))
+    @test isinteger(SimpleRatio(12, 1))
+    @test isinteger(SimpleRatio(1, 1))
+    @test isinteger(SimpleRatio(-1, 1))
+    @test isinteger(SimpleRatio(-1, -1))
+    @test isinteger(SimpleRatio(-10, -1))
+    @test isinteger(SimpleRatio(0, -1))
+    @test isinteger(SimpleRatio(0, 1))
+    @test isinteger(SimpleRatio(9, 3))
+    @test !isinteger(SimpleRatio(5, 3))
+    @test !isinteger(SimpleRatio(5, -3))
+    @test !isinteger(SimpleRatio(1, 2))
+    @test !isinteger(SimpleRatio(1, -2))
+    @test !isinteger(SimpleRatio(100, 99))
+    @test !isinteger(SimpleRatio(9, 6))
 end
