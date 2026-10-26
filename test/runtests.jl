@@ -18,6 +18,9 @@ using FixedPointNumbers
     @test r+1 == 1+r == SimpleRatio(3,2)
     @test r-1 == SimpleRatio(-1,2)
     @test 1-r == r
+    @test r < r2 && r <= r2 && !(r2 < r) && r <= r
+    @test SimpleRatio(-1,2) < 0 < r
+    @test isapprox(SimpleRatio(4,2), 2)
     @test r+r2 == SimpleRatio(7,6)
     @test r-r2 == SimpleRatio(-1,6)
     @test r^2 == SimpleRatio(1,4)
